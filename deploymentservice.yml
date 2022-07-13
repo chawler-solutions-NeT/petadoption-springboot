@@ -3,15 +3,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: infotrends
-  name: springboot-v1
+    app: petclinic-app
+  name: petclinic-app-v1
   namespace: default
 spec:
   progressDeadlineSeconds: 600
   replicas: 3
   selector:
     matchLabels:
-      app: infotrends
+      app: petclinic-app
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -20,12 +20,12 @@ spec:
   template:
     metadata:
       labels:
-        app: infotrends
+        app: petclinic-app
     spec:
       containers:
-      - image: vicky2911/springboot-v1:latest
+      - image: sundaylawal/cloudjerk:latest
         imagePullPolicy: Always
-        name: infotrends
+        name: petclinic-app
         ports:
         - containerPort: 80
           protocol: TCP
@@ -45,8 +45,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: infotrends
-  name: springboot-v1
+    app: petclinic-app
+  name: petclinic-app-v1
   namespace: default
 spec:
   allocateLoadBalancerNodePorts: true
