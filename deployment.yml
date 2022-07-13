@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: petclinic-app
+  name: petclinicapp
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: petclinic-app
+      app: petclinicapp
   template:
     metadata:
-      name: petclinic-pod
+      name: petclinicapp
       labels:
-        app: petclinic-app
+        app: petclinicapp
     spec:
       containers:
-      - name: petclinic-container
+      - name: petcliniccontainer
         image: sundaylawal/cloudjerk:latest
         imagePullPolicy: Always
         ports:
@@ -24,12 +24,12 @@ spec:
 apiVersion: v1
 kind: Service 
 metadata:
-  name: petclinic-svc
+  name: petclinicapp
   labels:
-    app: petclinic-app
+    app: petclinicapp
 spec:
   selector:
-    app: petclinic-app
+    app: petclinicapp
   type: NodePort
   ports:
   - nodePort: 31113
