@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: petclinic-container
-        image: sundaylawal/cloudjerk:2
+        image: sundaylawal/cloudjerk:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 80
@@ -34,4 +34,4 @@ spec:
   ports:
   - nodePort: 31113
     port: 80
-    targetPort: 80
+    targetPort: 8080
