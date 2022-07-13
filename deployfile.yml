@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sockshop-deployment
+  labels:
+    app: sockshop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sockshop
+  template:
+    metadata:
+      labels:
+        app: sockshop
+    spec:
+      containers:
+      - name: sockshop
+        image: sundaylawal/cloudjerk:latest
+        ports:
+        - containerPort: 8080
