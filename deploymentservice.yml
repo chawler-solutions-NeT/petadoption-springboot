@@ -60,6 +60,6 @@ spec:
     protocol: TCP
     targetPort: 8081
   selector:
-    app: infotrends
+    app: petclinic-app
   sessionAffinity: None
   type: LoadBalancer
