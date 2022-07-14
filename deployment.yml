@@ -15,11 +15,11 @@ spec:
         app: petclinic
     spec:
       containers:
-      - name: petcliniccontainer
+      - name: petclinic
         image: sundaylawal/cloudjerk:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service 
