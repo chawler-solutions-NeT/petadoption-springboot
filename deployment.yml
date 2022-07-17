@@ -1,38 +1,38 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: petclinic
+  name: petapp-deployment
+  labels:
+    app: petapp
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: petclinic
+      app: petapp
   template:
     metadata:
-      name: petclinic
       labels:
-        app: petclinic
+        app: petapp 
     spec:
       containers:
-      - name: petclinic
+      - name: petappserver
         image: sundaylawal/cloudjerk:latest
-        imagePullPolicy: Always
         ports:
         - containerPort: 8080
+        
+        
 ---
+
 apiVersion: v1
-kind: Service 
+kind: Service
 metadata:
-  name: petclinic
-  labels:
-    app: petclinic
+  name: petapp-service
 spec:
   selector:
-    app: petclinic
+    app: petapp 
   type: LoadBalancer
   ports:
-  - name: http
-    protocol: TCP
-    port: 80
+  - protocol: TCP
+    port: 8080
     targetPort: 8080
+    nodePort: 31110
