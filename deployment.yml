@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: petappserver
-        image: sundaylawal/cloudjerk:3
+        image: sundaylawal/cloudjerk:latest
         ports:
         - containerPort: 8080
         
@@ -35,4 +35,4 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 8080
-    nodePort: 31110
+    nodePort: 31600
