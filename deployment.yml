@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: petappserver
-        image: sundaylawal/cloudjerk:latest
+        image: sundaylawal/cloudjerk:$BUILD_NUMBER
         ports:
         - containerPort: 8080
         
