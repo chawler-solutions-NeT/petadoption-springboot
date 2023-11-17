@@ -1,16 +1,43 @@
 <!DOCTYPE html>
-
 <html xmlns:th="https://www.thymeleaf.org" th:replace="~{fragments/layout :: layout (~{::body},'home')}">
+<head>
+    <style>
+        body {
+            background-color: #f0f8ff; /* Light blue background */
+            color: #333333; /* Dark grey text */
+            font-family: Arial, sans-serif;
+        }
 
-  <body>
+        h2 {
+            color: #4a90e2; /* Blue for headings */
+            text-align: center;
+            margin-top: 50px;
+        }
 
+        .row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .col-md-12 {
+            text-align: center;
+        }
+
+        .img-responsive {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px; /* Optional: for rounded corners */
+        }
+    </style>
+</head>
+<body>
     <h2 th:text="#{welcome to a safe place}">Welcome to a safe place</h2>
     <div class="row">
         <div class="col-md-12">
-          <img class="img-responsive" src="../static/resources/images/upets.png" th:src="@{/resources/images/Dogs.png}"/>
+            <img class="img-responsive" src="../static/resources/images/upets.png" th:src="@{/resources/images/Dogs.png}"/>
         </div>
     </div>
-
-  </body>
-
+</body>
 </html>
