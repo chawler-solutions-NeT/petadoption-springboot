@@ -3,15 +3,17 @@
 <head>
     <style>
         body {
-            background-color: #f0f8ff; /* Light blue background */
-            color: #333333; /* Dark grey text */
-            font-family: Arial, sans-serif;
+            background-color: #f7f7f7; /* Soft grey background */
+            color: #333; /* Dark grey text */
+            font-family: 'Comic Sans MS', cursive, sans-serif; /* Playful font */
         }
 
         h2 {
-            color: #4a90e2; /* Blue for headings */
+            color: #ff6347; /* Tomato color for the heading */
             text-align: center;
             margin-top: 50px;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px #aaa; /* Shadow for depth */
         }
 
         .row {
@@ -19,6 +21,7 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            margin-top: 30px;
         }
 
         .col-md-12 {
@@ -26,14 +29,20 @@
         }
 
         .img-responsive {
-            max-width: 100%;
+            max-width: 80%;
             height: auto;
-            border-radius: 15px; /* Optional: for rounded corners */
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); /* Box shadow for 3D effect */
+            transition: 0.3s; /* Smooth transition for hover effect */
+        }
+
+        .img-responsive:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.3); /* Hover effect */
         }
     </style>
 </head>
 <body>
-    <h2 th:text="#{welcome to a safe place}">Welcome to a safe place</h2>
+    <h2 th:text="#{welcome to the puppy parade}">Welcome to the Puppy Parade, Where Tails Wag and Hearts Smile!</h2>
     <div class="row">
         <div class="col-md-12">
             <img class="img-responsive" src="../static/resources/images/upets.png" th:src="@{/resources/images/upets.png}"/>
