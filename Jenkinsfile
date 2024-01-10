@@ -12,7 +12,7 @@ pipeline {
         // Where your Nexus is running
         NEXUS_URL = "3.221.155.101:8081"
         // Repository where we will upload the artifact
-        NEXUS_REPOSITORY = "csnet"
+        NEXUS_REPOSITORY = "petadoption"
         // Jenkins credential id to authenticate to Nexus OSS
         NEXUS_CREDENTIAL_ID = "nexus"
 
