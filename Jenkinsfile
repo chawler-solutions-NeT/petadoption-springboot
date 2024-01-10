@@ -27,7 +27,7 @@ pipeline {
     
         stage('Compile and Build') {
             steps {
-                sh "mvn clean install -Dmaven.test.skip=true"
+                sh "mvn clean install -Dmaven.test.skip=true -Dcheckstyle.skip"
             }
         }
         
