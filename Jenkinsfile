@@ -1,61 +1,116 @@
 pipeline {
-        agent any
+    agent any
+    tools {
+        maven 'maven'
+    }
+
     environment {
-        DOCKER_USER = credentials('docker-username')
-        DOCKER_PASSWORD = credentials('docker-password') 
-    } 
-        tools {
-                maven "Maven"
+        // This can be nexus3 or nexus2
+        NEXUS_VERSION = "nexus3"
+        // This can be http or https
+        NEXUS_PROTOCOL = "http"
+        // Where your Nexus is running
+        NEXUS_URL = "3.221.155.101:8081"
+        // Repository where we will upload the artifact
+        NEXUS_REPOSITORY = "csnet"
+        // Jenkins credential id to authenticate to Nexus OSS
+        NEXUS_CREDENTIAL_ID = "nexus"
+
+    }
+
+    stages {
+        stage('Checkout SCM') {
+            steps {
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/chawler-solutions-NeT/petadoption-springboot.git'
+            }
         }
     
-    stages {
-        stage('pullsourceCode'){
-            steps{ 
-                git branch: 'main', credentialsId: 'git-credentials', url: 'https://github.com/sundaylawal/petclinic-app.git'
+        stage('Compile and Build') {
+            steps {
+                sh "mvn clean install -Dmaven.test.skip=true"
             }
         }
         
-        stage('BuildCode'){
-            steps{ 
-                sh 'mvn install -DskipTests=true'
-            }
-        }
-        
-        stage('Login to Docker HUB') {
+        stage('Sonarqube Analysis') {
             steps {
-                echo '===Login to docker hub ==='
-                sh 'docker login --username $DOCKER_USER --password $DOCKER_PASSWORD'
-            }
-        }
-         
-        stage('Building Docker Image') { 
-            steps {
-                echo '=== Creating Docker image==='
-                sh 'docker build -t $DOCKER_USER/cloudjerk .' 
-            }
-        }
-        
-        stage('TAG Docker Image') {
-            steps {
-                echo '=== Tagging petclinic Docker Image ==='
-                sh 'docker tag $DOCKER_USER/cloudjerk $DOCKER_USER/cloudjerk:latest'
-            }
-        }
-        stage('Push Docker Image to docker hub') {
-            steps {
-                echo '=== Pushing Petclinic Docker Image ==='
-                sh 'docker push $DOCKER_USER/cloudjerk:latest'
-            }
-        }
-        
-        stage ('K8S Deploy') {
-                steps {
-                kubernetesDeploy(
-                    configs: 'deployfile.yml',
-                    kubeconfigId: 'kubernetes',
-                    enableConfigSubstitution: true
-                    ) 
+                withSonarQubeEnv(installationName:'sonarqube', credentialsId: 'sonarqube') {
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=csnet -X'
                 }
+            }
         }
-  }
+
+        stage("quality gate"){
+            steps {
+                sleep(10)
+                script {
+                  waitForQualityGate abortPipeline: false, credentialsId: 'sonarqube' 
+                }
+           }
+        }
+        
+        stage("publish to nexus") {
+            steps {
+                script {
+                    // Read POM xml file using 'readMavenPom' step , this step 'readMavenPom' is included in: https://plugins.jenkins.io/pipeline-utility-steps
+                    pom = readMavenPom file: "pom.xml";
+                    // Find built artifact under target folder
+                    filesByGlob = findFiles(glob: "target/*.${pom.packaging}");
+                    // Print some info from the artifact found
+                    echo "${filesByGlob[0].name} ${filesByGlob[0].path} ${filesByGlob[0].directory} ${filesByGlob[0].length} ${filesByGlob[0].lastModified}"
+                    // Extract the path from the File found
+                    artifactPath = filesByGlob[0].path;
+                    // Assign to a boolean response verifying If the artifact name exists
+                    artifactExists = fileExists artifactPath;
+
+                    if(artifactExists) {
+                        echo "*** File: ${artifactPath}, group: ${pom.groupId}, packaging: ${pom.packaging}, version ${pom.version}";
+
+                        nexusArtifactUploader(
+                            nexusVersion: NEXUS_VERSION,
+                            protocol: NEXUS_PROTOCOL,
+                            nexusUrl: NEXUS_URL,
+                            groupId: pom.groupId,
+                            version: pom.version,
+                            repository: NEXUS_REPOSITORY,
+                            credentialsId: NEXUS_CREDENTIAL_ID,
+                            artifacts: [
+                                // Artifact generated such as .jar, .ear and .war files.
+                                [artifactId: pom.artifactId,
+                                classifier: '',
+                                file: artifactPath,
+                                type: pom.packaging]
+                            ]
+                        );
+
+                    } else {
+                        error "*** File: ${artifactPath}, could not be found";
+                    }
+                }
+            }
+        }
+
+    
+        stage('Tomcat Deploy') {
+            steps {
+                deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://3.235.127.123:8085/')], contextPath: null, onFailure: false, war: '**/*.war'
+            }
+        }
+        
+        stage('Start Java application') {
+            steps {
+                sshPublisher(publishers: [sshPublisherDesc(configName: 'tomcat', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'screen -dmS myapp sudo java -jar /opt/tomcat9/webapps/spring-petclinic-2.4.2.war', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            }
+        }
+        
+        //stage('OWASP Dependency Check') {
+         //   steps {
+          //      script {
+         //           dependencyCheck additionalArguments: "--scan target/", odcInstallation: 'owasp'
+          //          dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+          //      }
+         ///   }
+       //}
+        
+    }    
+    
 }
